@@ -17,8 +17,8 @@ ENV PATH="/root/.local/bin:${PATH}"
 WORKDIR /app
 
 # Копируем зависимости и устанавливаем в /deps
-COPY pyproject.toml uv.lock ./
-RUN pip install --no-cache-dir --target /deps .
+COPY pyproject.toml uv.lock README.md ./
+RUN uv pip install --system --no-cache --target /deps .
 
 # =======================
 # Стадия runtime
@@ -30,17 +30,14 @@ WORKDIR /app
 # Копируем установленные зависимости из builder
 COPY --from=builder /deps /usr/local/lib/python3.13/site-packages
 
-# Копируем исходники
-COPY . .
+# Копируем исходники (исключаем ненужные файлы)
+COPY main.py ./
+COPY tests/ tests/
 
 # Устанавливаем утилиты для отладки сети
-USER root
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl iputils-ping net-tools \
     && rm -rf /var/lib/apt/lists/*
-
-# (опционально) Проверка uv
-# RUN uv --version && uv pip list
 
 ARG BOT_USER=botuser
 ARG BOT_UID=501
