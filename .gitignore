@@ -1,0 +1,141 @@
+# =====================
+# Python cache & builds
+# =====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+.pybuild
+
+# =====================
+# Virtual environments
+# =====================
+
+.env
+.venv
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+.pyenv/
+.mise.toml
+.python-version
+
+# =====================
+# Package management
+# =====================
+*.egg
+*.egg-info/
+.installed.cfg
+*.whl
+wheels/
+develop-eggs/
+downloads/
+eggs/
+parts/
+sdist/
+var/
+
+# =====================
+# PyInstaller
+# =====================
+*.manifest
+*.spec
+
+# =====================
+# Testing & coverage
+# =====================
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.testmondata
+.testmondata-journal
+.hypothesis/
+
+# =====================
+# Logs
+# =====================
+*.log
+logs/
+
+# =====================
+# Jupyter Notebook
+# =====================
+.ipynb_checkpoints
+
+# =====================
+# IDEs
+# =====================
+.vscode/
+.idea/
+*.sublime*
+*.swp
+*.swo
+.run/
+
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
+.exrc
+
+# =====================
+# Documentation
+# =====================
+docs/_build/
+
+# =====================
+# Django / frameworks
+# =====================
+*.pot
+*.mo
+
+# =====================
+# Local media / data
+# =====================
+/media/       # кроме самого каталога
+!/media/.gitkeep
+*.db
+*.sqlite3
+
+# =====================
+# Containers / Docker
+# =====================
+# Игнорировать только генерируемые файлы:
+# Dockerfile.generated
+# Containerfile.generated
+
+# =====================
+# Ruff cache
+# =====================
+.ruff_cache/
+
+# =====================
+# Misc
+# =====================
+*.orig
+rolex
+uv.lock
+
+# =====================
+# Secrets
+# =====================
+.secrets
+*.mp4
+.vscode

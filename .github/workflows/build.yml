@@ -1,0 +1,133 @@
+---
+name: Build, Test and Push Container
+
+'on':
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  REGISTRY: quay.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # ---------------- Checkout ----------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------- Verify Quay.io secrets ----------------
+      - name: Verify Quay.io secrets
+        run: |
+          if [ -z "${{ secrets.QUAY_USERNAME }}" ]; then
+            echo "❌ QUAY_USERNAME is missing"
+            exit 1
+          else
+            echo "✅ QUAY_USERNAME is set"
+          fi
+          if [ -z "${{ secrets.QUAY_PASSWORD }}" ]; then
+            echo "❌ QUAY_PASSWORD is missing"
+            exit 1
+          else
+            echo "✅ QUAY_PASSWORD is set"
+          fi
+
+      # ---------------- Setup Python ----------------
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # ---------------- Setup UV ----------------
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v1
+
+      # ---------------- Install dev dependencies ----------------
+      - name: Install dependencies
+        env:
+          UV_LINK_MODE: copy
+        run: |
+          uv venv .venv
+          uv sync --all-extras
+
+      # ---------------- Verify virtual environment ----------------
+      - name: Verify virtual environment
+        run: |
+          echo "Virtual environment tools:"
+          .venv/bin/python --version
+          .venv/bin/black --version
+          .venv/bin/ruff --version
+          .venv/bin/pytest --version
+
+      # ---------------- Run linters ----------------
+      - name: Run linters (local mode)
+        if: ${{ env.ACT }}
+        run: |
+          echo "Linting skipped for local testing"
+
+      - name: Run linters (GitHub mode)
+        if: ${{ !env.ACT }}
+        run: |
+          .venv/bin/black --check --diff .
+          .venv/bin/ruff check .
+
+      # ---------------- Run tests ----------------
+      - name: Run tests
+        run: |
+          if [ -d "tests" ] || [ -f "test_*.py" ]; then
+            .venv/bin/pytest -v --tb=short
+          else
+            echo "No tests found, skipping..."
+          fi
+
+      # ---------------- Docker Build & Push ----------------
+      - name: Set up Docker Buildx
+        if: ${{ !env.ACT }}
+        uses: docker/setup-buildx-action@v3
+
+      - name: Debug Quay secrets
+        run: |
+          echo "👤 QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}"
+          if [ -n "${{ secrets.QUAY_PASSWORD }}" ]; then
+            echo "🔑 QUAY_PASSWORD is set (hidden)"
+          else
+            echo "❌ QUAY_PASSWORD is missing"
+            exit 1
+          fi
+      - name: Login to Quay.io
+        if: ${{ github.event_name != 'pull_request' && !env.ACT }}
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Cache Docker layers
+        if: ${{ !env.ACT }}
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build and Push image
+        if: ${{ !env.ACT }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Containerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            quay.io/nikolasheva/my-bot:latest
+            quay.io/nikolasheva/my-bot:${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
