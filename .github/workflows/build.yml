@@ -1,7 +1,7 @@
 ---
 name: Build, Test and Push Container
 
-'on':
+"on":
   push:
     branches: ["main"]
   pull_request:
@@ -125,9 +125,11 @@ jobs:
         with:
           context: .
           file: ./Containerfile
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' && !env.ACT }}
           tags: |
             quay.io/nikolasheva/my-bot:latest
             quay.io/nikolasheva/my-bot:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+          # Добавьте эту опцию для отладки
+          provenance: false
