@@ -18,7 +18,7 @@ WORKDIR /app
 
 # Копируем зависимости и устанавливаем в /deps
 COPY pyproject.toml uv.lock ./
-RUN uv pip install --no-cache --target /deps .
+RUN pip install --no-cache-dir --target /deps .
 
 # =======================
 # Стадия runtime
