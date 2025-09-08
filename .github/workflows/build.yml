@@ -11,6 +11,7 @@ name: Build, Test and Push Container
 env:
   REGISTRY: quay.io
   IMAGE_NAME: ${{ github.repository }}
+  ACT: false
 
 jobs:
   test-and-build:
@@ -131,5 +132,5 @@ jobs:
             quay.io/nikolasheva/my-bot:${{ github.sha }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          # Добавьте эту опцию для отладки
+          # для отладки
           provenance: false
