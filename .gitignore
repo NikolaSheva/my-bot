@@ -18,6 +18,8 @@ pip-delete-this-directory.txt
 # =====================
 
 .env
+.env.*
+.env.local
 .venv
 env/
 venv/
@@ -137,5 +139,7 @@ uv.lock
 # Secrets
 # =====================
 .secrets
+.secrets.local
+.secrets.*
 *.mp4
 .vscode

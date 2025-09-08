@@ -1,5 +1,9 @@
 # 🤖 MyBot — Telegram Bot for Content Parsing and Publishing
 
+![Kubernetes](https://img.shields.io/badge/Kubernetes-Deployed-blue)
+![Podman](https://img.shields.io/badge/Podman-Ready-red)
+![Python](https://img.shields.io/badge/Python-3.13-green)
+
 Telegram bot for parsing content from lombard-perspectiva.ru and publishing posts to channels. Supports text editing and image management before publication.
 
 ---
@@ -53,8 +57,8 @@ pytest tests/
 
 ---
 
-🐳 Production Deployment with Systemd  
-Quadlet Configuration  
+🐳 Production Deployment Options  
+### Quadlet (Systemd + Podman)  
 Create ~/.config/containers/systemd/mybot.container:  
 [Unit]  
 Description=MyBot Container Service  
@@ -64,8 +68,8 @@ After=network-online.target
 [Container]  
 Image=quay.io/nikolasheva/my-bot:latest  
 ContainerName=mybot  
-EnvironmentFile=%h/my-bot/.env  
-Volume=%h/my-bot/media:/app/pics:Z  
+EnvironmentFile=%h/my-bot/.env
+Volume=%h/mydata/my_bot/pics:/app/pics:Z  
 Network=host
 
 [Service]  
@@ -84,6 +88,96 @@ systemctl --user stop mybot.service
 
 # Monitor logs  
 journalctl --user -u mybot.service -f  
+### Kubernetes Deployment  
+
+1. Создать секреты для бота:  
+```bash
+kubectl create secret generic mybot-secrets \
+  --from-literal=BOT_TOKEN="your_bot_token" \
+  --from-literal=API_ID="your_api_id" \
+  --from-literal=API_HASH="your_api_hash" \
+  --from-literal=CHANNEL_ID="@your_channel" \
+  --from-literal=ADMIN_ID="your_admin_id"
+```
+
+2. Применить Deployment:  
+```bash
+kubectl apply -f k8s/deployment.yaml
+```
+
+3. Проверить статус пода:  
+```bash
+kubectl get pods -l app=my-bot
+```
+
+4. Смотреть логи:  
+```bash
+kubectl logs -f deployment/my-bot-deployment
+```
+
+> ⚠️ Не храните `.env` в репозитории. Все секреты передаются через Kubernetes Secret.
+
+## 🐋 Kubernetes Deployment
+
+### Image Availability
+
+```bash
+podman pull quay.io/nikolasheva/my-bot:latest
+podman pull quay.io/nikolasheva/my-bot:v1
+```
+
+- Signed images for trust and integrity
+- Security scans for vulnerabilities
+- Versioned tags for release management
+
+## 🚀 Multiple Deployment Options
+
+### Development (Podman)
+
+```bash
+podman run -d --name my-bot --env-file .env my-bot:latest
+```
+
+### Production Single Server (Systemd)
+
+```bash
+systemctl --user enable --now mybot.service
+```
+
+### Production Cloud (Kubernetes)
+
+```bash
+kubectl apply -f k8s/deployment.yaml
+```
+
+## 🧪 Testing
+
+- Basic tests:
+
+```bash
+pytest tests/
+```
+
+- With coverage:
+
+```bash
+pytest --cov=main tests/
+```
+
+- Specific test file:
+
+```bash
+pytest tests/test_basic.py -v
+```
+
+### Test Structure
+
+- `test_basic.py` — Basic test file  
+- `test_parsing.py` — TODO: parsing tests  
+- `test_telegram.py` — TODO: telegram interaction tests  
+
+---
+
 🔧 Configuration
 
 Environment Variables  

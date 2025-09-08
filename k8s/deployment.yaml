@@ -1,0 +1,42 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.5.2
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-bot-deployment
+  labels:
+    app: my-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-bot
+  template:
+    metadata:
+      labels:
+        app: my-bot
+    spec:
+      imagePullSecrets:
+        - name: quay-pull-secret
+      containers:
+        - name: my-bot
+          image: quay.io/nikolasheva/my-bot:v1
+          args: ["main.py"]
+          envFrom:
+            - secretRef:
+                name: mybot-secrets
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
