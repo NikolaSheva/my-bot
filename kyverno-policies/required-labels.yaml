@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-labels
+  annotations:
+    policies.kyverno.io/title: Require `app` label
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Ensures that every Pod has an `app` label for better organization and selection.
+spec:
+  validationFailureAction: Enforce   # можно поставить Audit, если хочешь только предупреждать
+  background: true
+  rules:
+    - name: check-for-app-label
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      validate:
+        message: "All Pods must have an 'app' label."
+        pattern:
+          metadata:
+            labels:
+              app: "?*"

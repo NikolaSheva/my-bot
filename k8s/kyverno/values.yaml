@@ -1,0 +1,19 @@
+# k8s/kyverno/values.yaml - для установки самого Kyverno
+
+# admissionController:
+#   replicaCount: 1  # Пока 1 для разработки
+
+# backgroundController:
+#   replicaCount: 1
+
+# cleanupController:
+#   replicaCount: 1
+
+# reportsController:
+#   replicaCount: 1
+
+# Закомментированные настройки для future use
+# admissionController:
+#   replicaCount: 3
+# metrics:
+#   enabled: true

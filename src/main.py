@@ -1,44 +1,12 @@
-import logging
-import sys
+# main.py 
 import time
-import telebot
 from telebot import types
-import os
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
-
-
-# ------------------- Logging Configuration -------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
+from config import bot, CHANNEL_ID
+import logging
 
 logger = logging.getLogger(__name__)
-logger.info("Бот запускается...")
-
-# ------------------- Telegram Bot -------------------
-load_dotenv()
-
-TOKEN = os.getenv("BOT_TOKEN")
-if not TOKEN:
-    logger.error("Токен не найден в переменных окружения (BOT_TOKEN)")
-    raise ValueError("Токен не найден в переменных окружения (BOT_TOKEN)")
-bot = telebot.TeleBot(TOKEN, skip_pending=True)
-
-CHANNEL_ID = os.getenv("CHANNEL_ID")
-if not CHANNEL_ID:
-    logger.error("CHANNEL_ID не найден в переменных окружения")
-    raise ValueError("CHANNEL_ID не найден в переменных окружения")
-
-ADMIN_ID = os.getenv("ADMIN_ID")
-if not ADMIN_ID:
-    logger.error("ADMIN_ID не найден в переменных окружения")
-    raise ValueError("ADMIN_ID не найден в переменных окружения")
-ADMIN_ID = int(ADMIN_ID)
-
 
 # Глобальный словарь для хранения сессий пользователей
 user_data = {}
@@ -167,7 +135,9 @@ def parse_lombard_page(url):
 <b>Цена:</b> {price}
 <b>Наши контакты:</b> @Genesislab
 Екатеринбург
-+7(982)663-99-99"""
++7(982)663-99-99
+"""
+        
 
     except Exception as e:
         logger.error(f"Ошибка парсинга {url}: {e}")
@@ -715,4 +685,4 @@ def confirm_bulk_remove_callback(call):
 
 if __name__ == "__main__":
     logger.info("Бот запущен...")
-    bot.polling(skip_pending=True, non_stop=True, timeout=60)
+    bot.polling(non_stop=True)

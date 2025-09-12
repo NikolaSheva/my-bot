@@ -143,3 +143,9 @@ uv.lock
 .secrets.*
 *.mp4
 .vscode
+__pycache__/
+*.pyc
+*.sqlite
+.env
+*.log
+.sqlite

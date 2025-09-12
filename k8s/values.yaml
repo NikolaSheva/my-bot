@@ -1,0 +1,18 @@
+# values.yaml для Kyverno HA
+admissionController:
+  replicaCount: 3  # Высокая доступность для критичного компонента
+
+backgroundController:
+  replicaCount: 2   # Отказоустойчивость для фоновых задач
+
+cleanupController:
+  replicaCount: 2   # Отказоустойчивость для cleanup-задач
+
+reportsController:
+  replicaCount: 2   # Отказоустойчивость для генерации отчетов
+
+# Другие возможные настройки, которые можно добавить позже:
+# metrics:
+#   enabled: true   # Включение метрик для Prometheus
+# 
+# validationFailureAction: Enforce # Глобальное действие при ошибке валидации
