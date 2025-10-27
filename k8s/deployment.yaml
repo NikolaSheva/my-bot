@@ -1,6 +1,6 @@
 # Save the output of this file and use kubectl create -f to import
 # it into Kubernetes.
-#
+ # Манифест для развертывания (Манифест 1)
 # Created with podman-5.5.2
 
 ---

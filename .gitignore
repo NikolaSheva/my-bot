@@ -9,42 +9,22 @@ __pycache__/
 build/
 dist/
 *.egg-info/
-pip-log.txt
-pip-delete-this-directory.txt
-.pybuild
 
 # =====================
 # Virtual environments
 # =====================
-
+.venv/
+venv/
+env/
 .env
 .env.*
-.env.local
-.venv
-env/
-venv/
-.venv/
-ENV/
-env.bak/
-venv.bak/
-.pyenv/
-.mise.toml
-.python-version
 
 # =====================
 # Package management
 # =====================
 *.egg
-*.egg-info/
-.installed.cfg
 *.whl
 wheels/
-develop-eggs/
-downloads/
-eggs/
-parts/
-sdist/
-var/
 
 # =====================
 # PyInstaller
@@ -57,16 +37,12 @@ var/
 # =====================
 htmlcov/
 .tox/
-.coverage
-.coverage.*
+.coverage*
 .cache
 .pytest_cache/
 nosetests.xml
 coverage.xml
 *.cover
-*.py,cover
-.testmondata
-.testmondata-journal
 .hypothesis/
 
 # =====================
@@ -81,14 +57,13 @@ logs/
 .ipynb_checkpoints
 
 # =====================
-# IDEs
+# IDEs / Editor
 # =====================
 .vscode/
 .idea/
 *.sublime*
 *.swp
 *.swo
-.run/
 
 # =====================
 # OS files
@@ -111,17 +86,18 @@ docs/_build/
 # =====================
 # Local media / data
 # =====================
-/media/       # кроме самого каталога
+/media/
 !/media/.gitkeep
 *.db
 *.sqlite3
 
 # =====================
-# Containers / Docker
+# Containers / Docker / Podman
 # =====================
-# Игнорировать только генерируемые файлы:
-# Dockerfile.generated
-# Containerfile.generated
+Dockerfile.*
+Containerfile.*
+.deps/
+.docker/
 
 # =====================
 # Ruff cache
@@ -139,7 +115,17 @@ uv.lock
 # Secrets
 # =====================
 .secrets
-.secrets.local
 .secrets.*
-*.mp4
-.vscode
+jobs.sqlite
+my_bot.session
+
+# =====================
+# Gitleaks
+# =====================
+gitleaks-report.json
+
+# =====================
+# Pyrogram sessions
+# =====================
+*.session
+*.session-journal
