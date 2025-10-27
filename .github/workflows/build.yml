@@ -45,11 +45,9 @@ jobs:
         run: |
           podman build \
             --pull-always \
-            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v1 \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2 \
             -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
             -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}: \
-            ${{ github.run_number }} \
             -f Containerfile .
 
       - name: Security scan
@@ -60,14 +58,14 @@ jobs:
 
       - name: Push image
         run: |
-          podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v1
+          podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2
           podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           podman push \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
       - name: Get image digest
         id: image-digest
         run: |
-          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v1"
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2"
           DIGEST=$(podman inspect --format='{{.Digest}}' "${IMAGE_TAG}")
           echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 

@@ -33,6 +33,7 @@ Telegram bot for parsing content from lombard-perspectiva.ru and publishing post
 
 ```bash
 CHANNEL_ID=@your_channel
+MY_CHANNEL_ID=@new_channel
 ADMIN_ID=your_admin_id
 BOT_TOKEN=your_bot_token
 API_ID=your_api_id
