@@ -23,7 +23,7 @@ ENV PATH="/root/.local/bin:${PATH}"
 WORKDIR /app
 
 # Копируем зависимости и устанавливаем в /deps
-COPY pyproject.toml uv.lock README.md ./
+COPY pyproject.toml README.md ./
 RUN uv pip install --system --no-cache --target /deps .
 
 # =======================
@@ -38,7 +38,7 @@ COPY --from=builder /deps /usr/local/lib/python3.13/site-packages
 
 # Копируем исходники (без тестов)
 COPY src/ src/
-COPY pyproject.toml uv.lock README.md ./
+COPY pyproject.toml README.md ./
 
 # Устанавливаем утилиты для отладки сети без фиксированных версий
 RUN apt-get update && apt-get install -y --no-install-recommends \
