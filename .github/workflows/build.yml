@@ -47,9 +47,8 @@ jobs:
             --pull-always \
             -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v1 \
             -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:\
-            ${{ github.sha }} \
-            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:\
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}: \
             ${{ github.run_number }} \
             -f Containerfile .
 
