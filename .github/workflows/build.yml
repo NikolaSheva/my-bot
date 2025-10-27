@@ -7,7 +7,6 @@ on:
   pull_request:
     branches: ["main"]
   workflow_dispatch: {}
-
 env:
   REGISTRY: quay.io
   IMAGE_NAME: nikolasheva/my-bot
@@ -19,14 +18,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache Podman layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildah-cache
-          key: ${{ runner.os }}-buildah-${{ hashFiles('Containerfile') }}
-          restore-keys: |
-            ${{ runner.os }}-buildah-
-
       - name: Install Podman
         run: |
           sudo apt-get update
@@ -37,35 +28,29 @@ jobs:
 
       - name: Login to Quay.io
         run: |
-          echo "${{ secrets.QUAY_PASSWORD }}" | podman login \
-            "${{ env.REGISTRY }}" -u "${{ secrets.QUAY_USERNAME }}" --password-stdin
+          echo "${{ secrets.QUAY_PASSWORD }}" | podman login ${{ env.REGISTRY }} -u "${{ secrets.QUAY_USERNAME }}" --password-stdin
 
       - name: Build image
         run: |
           podman build --pull-always \
-            -t "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2" \
-            -t "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" \
-            -t "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2 \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
             -f Containerfile .
-
-      - name: Security scan
-        run: |
-          podman scan \
-            "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}" || true
 
       - name: Push image
         run: |
-          podman push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2"
-          podman push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
-          podman push "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2
+          podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Get image digest
         id: image-digest
         run: |
           IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:v2"
-          DIGEST=$(podman inspect --format '{{ index .RepoDigests 0 }}' "$IMAGE_TAG" | cut -d'@' -f2)
-          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          DIGEST=$(podman inspect --format '{{.Digest}}' "$IMAGE_TAG")
+          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
 
       - name: Output digest
         run: |
-          echo "Image digest: '${{ steps.image-digest.outputs.digest }}'"
+          echo "Image digest: ${{ steps.image-digest.outputs.digest }}"
