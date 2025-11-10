@@ -1,6 +1,7 @@
 # =======================
 # Стадия builder
 # =======================
+
 FROM python:3.13-slim as builder
 SHELL ["/bin/bash", "-exo", "pipefail", "-c"]
 
@@ -16,8 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем uv
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && /root/.local/bin/uv --version
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN /root/.local/bin/uv --version
 ENV PATH="/root/.local/bin:${PATH}"
 
 WORKDIR /app
@@ -49,6 +50,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dnsutils \
     && rm -rf /var/lib/apt/lists/*
 
+    # Добавляем /app в Python path
+ENV PYTHONPATH="/app:${PYTHONPATH}"
 # Создаём пользователя и переключаемся
 ARG BOT_USER=botuser
 ARG BOT_UID=501
@@ -56,5 +59,5 @@ RUN useradd -l -m -u ${BOT_UID} ${BOT_USER}
 USER ${BOT_USER}
 
 # Запуск пакета как модуля
-ENTRYPOINT ["python", "-m"]
-CMD ["main"]
+
+CMD ["python", "-m", "src.main"]

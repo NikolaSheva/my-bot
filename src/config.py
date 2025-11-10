@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 from typing import List, Tuple
+
 
 class Settings(BaseSettings):
     # Telegram
@@ -13,7 +15,17 @@ class Settings(BaseSettings):
     # Бизнес-логика
     max_photos: int = 10
     max_text_length: int = 4000
-    custom_photos: List[str] = []
+
+    # Пустой список: Field(default_factory=list)
+    custom_photos: List[str] = Field(default_factory=list) # Добавляем кастомные фото
+    custom_videos: List[str] = Field(default_factory=list) # ДОБАВЛЯЕМ ВИДЕО
+    
+    # С одним/несколькими видео: Field(default_factory=lambda: ["video1.mp4", "video2.mp4"])
+    # custom_videos: List[str] = Field(default_factory=lambda: ["src/static/videos/patek_universal.mp4"])
+    # find . -name "*.pyc" -delete
+    # find . -name "__pycache__" -type d -exec rm -r {} +
+   
+    
 
     # Безопасность
     rate_limit_per_minute: int = 10
@@ -47,13 +59,13 @@ settings = Settings()
 
 try:
     settings.validate_channels()
-    print("✅ Настройки каналов загружены успешно")
+    print("Настройки каналов загружены успешно")
     print(f"Доступные каналы: {[name for name, _ in settings.all_channels]}")
 except ValueError as e:
-    print(f"❌ Ошибка в настройках: {e}")
+    print(f"Ошибка в настройках: {e}")
 
 if __name__ == "__main__":
-    print("\n🔍 Детальная проверка настроек:")
+    print("\nДетальная проверка настроек:")
     print(f"Channel ID: '{settings.channel_id}'")
     print(f"My Channel ID: '{settings.my_channel_id}'")
     print(f"Все каналы: {settings.all_channels}")

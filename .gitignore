@@ -128,4 +128,4 @@ gitleaks-report.json
 # Pyrogram sessions
 # =====================
 *.session
-*.session-journal
+*.session-journalstatic/videos/

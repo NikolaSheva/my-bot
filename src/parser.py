@@ -4,6 +4,7 @@ import logging
 from urllib.parse import urljoin
 from typing import List
 from .config import settings
+import re
 
 
 logger = logging.getLogger(__name__)
@@ -30,6 +31,7 @@ class LombardParser:
 
             ref_tag = soup.find("div", class_="text-gray")
             reference = ref_tag.get_text(strip=True) if ref_tag else "Нет данных"
+            safe_reference = reference.replace('.', '.\u200B')
 
             price_tag = soup.find("p", class_="item-price--text")
             price = "По запросу"
@@ -94,26 +96,78 @@ class LombardParser:
                         if full_url not in seen_urls:
                             seen_urls.add(full_url)
                             photos.append(full_url)
-                            logger.debug(f"📸 Добавлено фото: {full_url}")
+                            logger.debug(f"Добавлено фото: {full_url}")
 
             # Ограничиваем количество фото
             photos = photos[:10]
             # убираем дубликаты без custom_photos
             # photos = list(dict.fromkeys(photos))[:3]
 
+            if price == "По запросу":
+                match = re.search(r'(\d[\d\s,.]*\s?\$)', characteristics.get('Состояние', ''))
+                price_to_use = match.group(1) if match else price
+            else:
+                price_to_use = price
+
+            # Формируем список важных характеристик, пропуская пустые и "Нет данных"
+            important_chars = [
+                ("Материал корпуса", characteristics["Материал корпуса"]),
+                ("Водонепроницаемость", characteristics["Водонепроницаемость"]),
+                ("Диаметр", characteristics["Диаметр корпуса"]),
+                ("Материал ремешка", characteristics["Материал ремешка"]),
+            ]
+
+            # Фильтруем только заполненные характеристики
+            char_line = [
+                f'<b>{key}:</b> {value}'
+                for key, value in important_chars
+                if value and value.strip() and value != "Нет данных"
+            ]
+
+            # Добавляем блок характеристик, если есть данные
+            characteristics_block = [*char_line, ""] if char_line else []
+
             # Формируем HTML
-            html = f"""<a href="{url}"><b>{title}</b>  <b>{subtitle}</b></a>
-<b>{reference}</b>
+            lines = [
+                f'<a href="{url}"><b>{title}</b>  <b>{subtitle.upper()}</b></a>',
+                f'<code>{safe_reference}</code>\n',
+                f'<b>Состояние:</b> {condition}',
+                *characteristics_block,
+                f'<b>Цена:</b> <b>{price_to_use}</b>\n',
+                '<b>Наши контакты:</b> @Genesislab',
+                '<b>Екатеринбург, ул. Маршала Жукова 13</b>',
+                'tel:+7(982)663-99-99     |     <a href="https://wa.me/79826639999">WhatsApp</a>\n',
+                '<b>Екатеринбург, ул. Сакко и Ванцетти 74</b>',
+                'Торговая галерея "LUXURY"',
+                'tel:+7(982)699-66-66      |     <a href="https://wa.me/79826996666">WhatsApp</a>',
+            ]
 
-<b>Состояние:</b> {condition}
-<b>Материал корпуса:</b> {characteristics['Материал корпуса']}
-<b>Функции:</b> {characteristics['Функции']}
-<b>Материал ремешка:</b> {characteristics['Материал ремешка']}
+            html = "\n".join(lines)
 
-<b>Цена:</b> {price}
-<b>Наши контакты:</b> @Genesislab
-Екатеринбург
-+7(982)663-99-99"""
+            # Формируем HTML
+            # lines = [
+            #     f'<a href="{url}"><b>{title}</b>  <b>{subtitle.upper()}</b></a>',
+            #     f'<code>{safe_reference}</code>\n',
+            #     f'<b>Состояние:</b> {condition}',
+            #     f'<b>Материал корпуса:</b> {characteristics["Материал корпуса"]}',
+            #     f'<b>Функции:</b> {characteristics["Функции"]}',
+            #     f'<b>Материал ремешка:</b> {characteristics["Материал ремешка"]}\n',
+            #     f'<b>Цена:</b> <b>{price_to_use}</b>\n',
+    
+            #     '<b>НАШИ КОНТАКТЫ:</b>',
+            #     '@Genesislab\n',
+                
+            #     '<b>Екатеринбург, ул. Маршала Жукова, 13</b>',
+            #     '<a href="+79826639999">+7 (982) 663-99-99</a>',
+            #     '<a href="https://wa.me/79826639999">Написать в WhatsApp</a>\n',
+                
+            #     '<b>Екатеринбург, ул. Сакко и Ванцетти, 74</b>',
+            #     'Галерея "LUXURY"',
+            #     'tel: +79826996666\n',
+            #     '<a href="https://wa.me/79826996666">Написать в WhatsApp</a>',
+            # ]
+            
+
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Ошибка сети при парсинге {url}: {e}")
@@ -123,9 +177,10 @@ class LombardParser:
             raise
 
         return html.strip(), photos
-    
-
     def get_custom_photos(self) -> List[str]:
         """Получить список кастомных фото"""
         return settings.custom_photos.copy()
     
+    def get_custom_videos(self) -> List[str]:
+        """Получить список кастомных видео"""
+        return settings.custom_videos.copy()

@@ -19,6 +19,7 @@ dependencies = [
     "pytelegrambotapi>=4.29.1",
     "pillow>=12.0.0",
     "pillow-heif>=1.1.1",
+    "telegram>=0.0.1",
 ]
 
 [build-system]

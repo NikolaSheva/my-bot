@@ -1,31 +1,30 @@
 # Save the output of this file and use kubectl create -f to import
 # it into Kubernetes.
- # Манифест для развертывания (Манифест 1)
+# Манифест для развертывания (Манифест 1)
 # Created with podman-5.5.2
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-bot-deployment
+  name: mybot-deployment
   labels:
-    app: my-bot
+    app: mybot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: my-bot
+      app: mybot
   template:
     metadata:
       labels:
-        app: my-bot
+        app: mybot
     spec:
       imagePullSecrets:
-        - name: quay-pull-secret
+        - name: quayio-secret
       containers:
-        - name: my-bot
-          image: quay.io/nikolasheva/my-bot:v1
-          args: ["main.py"]
+        - name: mybot
+          image: quay.io/nikolasheva/my-bot:v2
           envFrom:
             - secretRef:
                 name: mybot-secrets
@@ -40,3 +39,4 @@ spec:
             runAsNonRoot: true
             runAsUser: 1000
             allowPrivilegeEscalation: false
+        
