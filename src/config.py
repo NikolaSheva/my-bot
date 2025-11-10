@@ -3,6 +3,19 @@ from pydantic import Field
 from typing import List, Tuple
 
 
+CONTACTS = [
+        {"address": "<b>Наши контакты:</b> @Genesislab"},
+        {
+            "address": "<b>Екатеринбург, ул. Маршала Жукова 13</b>",
+            "tel": "+7(982)663-99-99",
+            "wa_link": "https://wa.me/79826639999"
+        },
+        {
+            "address": '<b>Екатеринбург, ул. Сакко и Ванцетти 74</b>, Торговая галерея "LUXURY"',
+            "tel": "+7(982)699-66-66",
+            "wa_link": "https://wa.me/79826996666"
+        }
+    ]
 class Settings(BaseSettings):
     # Telegram
     channel_id: str  # Основной канал

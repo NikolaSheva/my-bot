@@ -3,8 +3,10 @@ from bs4 import BeautifulSoup
 import logging
 from urllib.parse import urljoin
 from typing import List
-from .config import settings
+from config import settings, CONTACTS
 import re
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -133,39 +135,16 @@ class LombardParser:
                 f'<code>{safe_reference}</code>\n',
                 f'<b>Состояние:</b> {condition}',
                 *characteristics_block,
-                f'<b>Цена:</b> <b>{price_to_use}</b>\n',
-                '<b>Наши контакты:</b> @Genesislab',
-                '<b>Екатеринбург, ул. Маршала Жукова 13</b>',
-                'tel:+7(982)663-99-99     |     <a href="https://wa.me/79826639999">WhatsApp</a>\n',
-                '<b>Екатеринбург, ул. Сакко и Ванцетти 74</b>',
-                'Торговая галерея "LUXURY"',
-                'tel:+7(982)699-66-66      |     <a href="https://wa.me/79826996666">WhatsApp</a>',
             ]
+            for c in CONTACTS:
+                lines.append(c["address"])
+                if "tel" in c:
+                    lines.append(f'tel:{c["tel"]} | <a href="{c["wa_link"]}">WhatsApp</a>')
+                lines.append("")
+                
+    
 
             html = "\n".join(lines)
-
-            # Формируем HTML
-            # lines = [
-            #     f'<a href="{url}"><b>{title}</b>  <b>{subtitle.upper()}</b></a>',
-            #     f'<code>{safe_reference}</code>\n',
-            #     f'<b>Состояние:</b> {condition}',
-            #     f'<b>Материал корпуса:</b> {characteristics["Материал корпуса"]}',
-            #     f'<b>Функции:</b> {characteristics["Функции"]}',
-            #     f'<b>Материал ремешка:</b> {characteristics["Материал ремешка"]}\n',
-            #     f'<b>Цена:</b> <b>{price_to_use}</b>\n',
-    
-            #     '<b>НАШИ КОНТАКТЫ:</b>',
-            #     '@Genesislab\n',
-                
-            #     '<b>Екатеринбург, ул. Маршала Жукова, 13</b>',
-            #     '<a href="+79826639999">+7 (982) 663-99-99</a>',
-            #     '<a href="https://wa.me/79826639999">Написать в WhatsApp</a>\n',
-                
-            #     '<b>Екатеринбург, ул. Сакко и Ванцетти, 74</b>',
-            #     'Галерея "LUXURY"',
-            #     'tel: +79826996666\n',
-            #     '<a href="https://wa.me/79826996666">Написать в WhatsApp</a>',
-            # ]
             
 
 
